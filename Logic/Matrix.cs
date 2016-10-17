@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,6 +36,30 @@ namespace Geocode.Logic
 			}
 			tmp += key + Key.DistanceMatrixkey;
 			return tmp;
+		}
+
+		public async void ParseJson()
+		{
+			var uri = new Uri(ConstructURLFromCenter());
+			var httpClient = new HttpClient();
+			var content = await httpClient.GetStringAsync(uri);
+			JObject json = await Task.Run(() => JObject.Parse(content));
+
+			if (json["status"].ToString() != "OK")
+			{
+				Debug.WriteLine("Error first parsing");
+				return;
+			}
+
+			Response reponse = new Response();
+			reponse.Status = json["status"].ToString();
+			reponse.Origin = json["origin_addresses"][0].ToString();
+			foreach (var item in json["destination_addresses"])
+				reponse.Destination.Add(item.ToString());
+			foreach(var item in json["rows"])
+			{
+				reponse.Rows = item["elements"][0]
+			}
 		}
 
 		public List<Coordinate> GetDestinations()
