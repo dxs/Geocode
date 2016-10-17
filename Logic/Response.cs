@@ -9,9 +9,9 @@ namespace Geocode.Logic
 	class Response
 	{
 		public string Status { get; set; }
-		public string Origin { get; set; }
-		public List<string> Destination { get; set; }
-		public List<Elements> Rows { get; set; }
+		public string[] Origin_addresses { get; set; }
+		public string[] Destination_addresses { get; set; }
+		public Row[] Rows { get; set; }
 
 		public Response()
 		{
@@ -19,31 +19,38 @@ namespace Geocode.Logic
 		}
 	}
 
-	class Elements
+	class Row
+	{
+		public Element[] Elements {get;set;}
+	}
+
+	class Element
 	{
 		public string Status { get; set; }
-		public Duration Dur { get; set; }
-		public Distance Dist { get; set; }
-		public Elements()
+		public Dur Duration { get; set; }
+		public Dist Distance { get; set; }
+		public Element()
 		{
 		}
 	}
 
-	class Distance
+	class Dist
 	{
-		public string Status { get; set; }
-		public int Meter { get; set; }
+		public int Value { get; set; }
 		public string Text { get; set; }
-		public Distance()
+		public Dist()
 		{
 
 		}
 	}
 
-	class Duration
+	class Dur
 	{
-		public string Status { get; set; }
-		public int Second { get; set; }
+		public int Value { get; set; }
 		public string Text { get; set; }
+		public Dur()
+		{
+
+		}
 	}
 }

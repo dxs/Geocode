@@ -101,6 +101,7 @@
     <Compile Include="Logic\Drawing.cs" />
     <Compile Include="Logic\Geo.cs" />
     <Compile Include="Logic\Matrix.cs" />
+    <Compile Include="Logic\Response.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

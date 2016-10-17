@@ -38,28 +38,14 @@ namespace Geocode.Logic
 			return tmp;
 		}
 
-		public async void ParseJson()
+		public async Task<Response> ParseJson()
 		{
 			var uri = new Uri(ConstructURLFromCenter());
-			var httpClient = new HttpClient();
-			var content = await httpClient.GetStringAsync(uri);
-			JObject json = await Task.Run(() => JObject.Parse(content));
-
-			if (json["status"].ToString() != "OK")
-			{
-				Debug.WriteLine("Error first parsing");
-				return;
-			}
-
-			Response reponse = new Response();
-			reponse.Status = json["status"].ToString();
-			reponse.Origin = json["origin_addresses"][0].ToString();
-			foreach (var item in json["destination_addresses"])
-				reponse.Destination.Add(item.ToString());
-			foreach(var item in json["rows"])
-			{
-				reponse.Rows = item["elements"][0]
-			}
+			HttpClient client = new HttpClient();
+			var content = await client.GetStringAsync(uri);
+			JObject jReponse = await Task.Run(() => JObject.Parse(content));
+			Response r = (Response)jReponse.ToObject(typeof(Response));
+			return r;
 		}
 
 		public List<Coordinate> GetDestinations()
@@ -68,7 +54,7 @@ namespace Geocode.Logic
 
 			/*in km*/
 			double radius = 0;
-			int radiusIteration = 30;
+			int radiusIteration = 1;
 			int angleIteration = 0;
 			double angle = 0;
 			for (int i = 0; i < radiusIteration; i++)
@@ -86,6 +72,12 @@ namespace Geocode.Logic
 				}
 			}
 			return listDestinations;
+		}
+
+		public Response LaunchDispatcher()
+		{
+			Response response = new Response();
+			return null;
 		}
 
 		private double AddKmToLatitude(double latitude, double km)

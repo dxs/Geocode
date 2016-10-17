@@ -37,9 +37,8 @@ namespace Geocode
 			}
 
 			Coordinate c = await Geo.RequestCoordinate();
-			await mainMap.TrySetViewAsync(new Geopoint(new BasicGeoposition() { Latitude = c.Latitude, Longitude = c.Longitude }), 19, 0, 0, MapAnimationKind.Bow);
-
 			matrix = new Matrix(c);
+			await mainMap.TrySetViewAsync(new Geopoint(new BasicGeoposition() { Latitude = c.Latitude, Longitude = c.Longitude }), 19, 0, 0, MapAnimationKind.Bow);
 			Ring.Visibility = Visibility.Collapsed;
 			Debug.WriteLine("Done map");
 		}
@@ -49,7 +48,7 @@ namespace Geocode
 			SetupMap();
 		}
 
-		private void Button_Click(object sender, RoutedEventArgs e)
+		private async void Button_Click(object sender, RoutedEventArgs e)
 		{
 			if (matrix == null)
 				return;
@@ -64,6 +63,8 @@ namespace Geocode
 				icon.Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Images/loc.png"));
 				mainMap.MapElements.Add(icon);
 			}
+			Response res = matrix.LaunchDispatcher();
+			await matrix.ParseJson();
 		}
 	}
 }
