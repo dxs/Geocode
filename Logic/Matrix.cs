@@ -71,16 +71,25 @@ namespace Geocode.Logic
 			list.AddRange(GetDestinations());
 			for (int i = 0; i < list.Count / 100; i++)
 			{
-				var uri = new Uri(ConstructURLFromCenter(list.GetRange(list.Count/100*i,100)));
+				Debug.WriteLine("[INFO] Starting with {0}", i);
+				var uri = new Uri(ConstructURLFromCenter(list.GetRange(list.Count/100*i,list.Count/100)));
 				HttpClient client = new HttpClient();
-				var content = await client.GetStringAsync(uri);
+				string content = "";
+				try { content = await client.GetStringAsync(uri); }
+				catch(Exception e) { Debug.WriteLine("[ERROR] from [HTTPClient]"); }
+
 				JObject jReponse = await Task.Run(() => JObject.Parse(content));
 				Response r = (Response)jReponse.ToObject(typeof(Response));
-				if (r.Status != "OK") continue;
+				if (r.Status != "OK")
+				{
+					Debug.WriteLine("[Error] [NB : {0}] with response!", i);
+					continue;
+				}
 				foreach(var item in r.Destination_addresses)
 					response.Destination_addresses.Add(item);
 				foreach (var item in r.Rows)
 					response.Rows.Add(item);
+				await Task.Delay(100);
 			}
 			return response;
 		}
