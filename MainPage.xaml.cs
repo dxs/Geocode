@@ -52,7 +52,7 @@ namespace Geocode
 		{
 			if (matrix == null)
 				return;
-			matrix.ConstructURLFromCenter();
+			matrix.ConstructURLFromCenter(matrix.GetDestinations());
 			List<Coordinate> list = matrix.GetDestinations();
 			foreach(Coordinate coord in list)
 			{
@@ -63,8 +63,8 @@ namespace Geocode
 				icon.Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Images/loc.png"));
 				mainMap.MapElements.Add(icon);
 			}
-			Response res = matrix.LaunchDispatcher();
-			await matrix.ParseJson();
+			Response res = new Response();
+			res = await matrix.LaunchDispatcher();
 		}
 	}
 }

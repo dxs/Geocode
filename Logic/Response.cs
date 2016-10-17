@@ -9,19 +9,26 @@ namespace Geocode.Logic
 	class Response
 	{
 		public string Status { get; set; }
-		public string[] Origin_addresses { get; set; }
-		public string[] Destination_addresses { get; set; }
-		public Row[] Rows { get; set; }
+		public List<string> Origin_addresses { get; set; }
+		public List<string> Destination_addresses { get; set; }
+		public List<Row> Rows { get; set; }
 
 		public Response()
 		{
-
+			Origin_addresses = new List<string>();
+			Destination_addresses = new List<string>();
+			Rows = new List<Row>();
 		}
 	}
 
 	class Row
 	{
-		public Element[] Elements {get;set;}
+		public List<Element> Elements {get;set;}
+
+		public Row()
+		{
+			Elements = new List<Element>();
+		}
 	}
 
 	class Element
@@ -31,6 +38,7 @@ namespace Geocode.Logic
 		public Dist Distance { get; set; }
 		public Element()
 		{
+
 		}
 	}
 

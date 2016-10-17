@@ -23,29 +23,18 @@ namespace Geocode.Logic
 			Center = center;
 		}  
 
-		public string ConstructURLFromCenter()
+		public string ConstructURLFromCenter(List<Coordinate> list)
 		{
 			string tmp = API + origin + Center.Latitude + "," + Center.Longitude;
 			tmp += destination;
-			List<Coordinate> l = GetDestinations();
-			foreach(Coordinate item in l)
+			foreach(Coordinate item in list)
 			{
 				tmp += item.Latitude + "," + item.Longitude;
-				if (item != l.Last())
+				if (item != list.Last())
 					tmp += "|";
 			}
 			tmp += key + Key.DistanceMatrixkey;
 			return tmp;
-		}
-
-		public async Task<Response> ParseJson()
-		{
-			var uri = new Uri(ConstructURLFromCenter());
-			HttpClient client = new HttpClient();
-			var content = await client.GetStringAsync(uri);
-			JObject jReponse = await Task.Run(() => JObject.Parse(content));
-			Response r = (Response)jReponse.ToObject(typeof(Response));
-			return r;
 		}
 
 		public List<Coordinate> GetDestinations()
@@ -54,7 +43,7 @@ namespace Geocode.Logic
 
 			/*in km*/
 			double radius = 0;
-			int radiusIteration = 1;
+			int radiusIteration = 30;
 			int angleIteration = 0;
 			double angle = 0;
 			for (int i = 0; i < radiusIteration; i++)
@@ -74,10 +63,26 @@ namespace Geocode.Logic
 			return listDestinations;
 		}
 
-		public Response LaunchDispatcher()
+		public async Task<Response> LaunchDispatcher()
 		{
 			Response response = new Response();
-			return null;
+
+			List<Coordinate> list = new List<Coordinate>();
+			list.AddRange(GetDestinations());
+			for (int i = 0; i < list.Count / 100; i++)
+			{
+				var uri = new Uri(ConstructURLFromCenter(list.GetRange(list.Count/100*i,100)));
+				HttpClient client = new HttpClient();
+				var content = await client.GetStringAsync(uri);
+				JObject jReponse = await Task.Run(() => JObject.Parse(content));
+				Response r = (Response)jReponse.ToObject(typeof(Response));
+				if (r.Status != "OK") continue;
+				foreach(var item in r.Destination_addresses)
+					response.Destination_addresses.Add(item);
+				foreach (var item in r.Rows)
+					response.Rows.Add(item);
+			}
+			return response;
 		}
 
 		private double AddKmToLatitude(double latitude, double km)
